@@ -84,9 +84,9 @@ begin
 	   o_lights_L(0) => w_lights_L(0),
 	   o_lights_L(1) => w_lights_L(1),
 	   o_lights_L(2) => w_lights_L(2),
-	   o_lights_R(0) => w_lights_R(2),
+	   o_lights_R(0) => w_lights_R(0),
        o_lights_R(1) => w_lights_R(1),
-       o_lights_R(2) => w_lights_R(0)
+       o_lights_R(2) => w_lights_R(2)
 	   
 	);
 	-----------------------------------------------------
@@ -106,7 +106,7 @@ begin
 	sim_proc: process
 	begin
 	--sequential timing
-	   w_reset <= '1'; 
+	   w_reset <= '1';
 	   wait for k_clk_period*1;
              assert w_lights_R = "000" report "bad reset" severity failure;
              assert w_lights_L = "000" report "bad reset" severity failure;
@@ -114,21 +114,44 @@ begin
       wait for k_clk_period*1;
       
       --lights ON
-      -- w_right <= '1'; w_left <= '1';wait for k_clk_period*1;
-        --  assert w_lights_R = "111" report "lights not properly on" severity failure;
-        --  assert w_lights_L = "111" report "lights not properly on" severity failure;
+       w_right <= '1'; w_left <= '1';wait for k_clk_period*1;
+         assert w_lights_R = "111" report "lights not properly on" severity failure;
+         assert w_lights_L = "111" report "lights not properly on" severity failure;
+       wait for k_clk_period;
+         assert w_lights_R = "000" report "lights not properly on" severity failure;
+         assert w_lights_L = "000" report "lights not properly on" severity failure;
+       wait for k_clk_period;
+         assert w_lights_R = "111" report "lights not properly on" severity failure;
+         assert w_lights_L = "111" report "lights not properly on" severity failure;
      
      --left lights
-     w_left <= '1';-- w_right <= '0';
-     wait for k_clk_period;
+     w_left <= '1'; w_right <= '0';w_reset <= '0';
+     wait for k_clk_period*2;
         assert w_lights_L = "001" report "bad left signal" severity failure;
-        
-    --right lights
-    w_right <= '1'; w_left <= '0';
+        assert w_lights_R = "000" report "bad right signal" severity failure;
     wait for k_clk_period;
-        assert w_lights_R = "001" report "bad right signal" severity failure;
-     
-     
+        assert w_lights_L = "011" report "bad left signal" severity failure;
+        assert w_lights_R = "000" report "bad right signal" severity failure;
+    wait for k_clk_period;
+        assert w_lights_L = "111" report "bad left signal" severity failure;
+        assert w_lights_R = "000" report "bad right signal" severity failure;
+   -- w_reset <= '1';
+    wait for k_clk_period*1;
+    
+     --right lights
+       w_right <= '1'; w_left <= '0';w_reset <= '0';
+       wait for k_clk_period*1;
+           assert w_lights_R = "001" report "bad right signal" severity failure;
+           assert w_lights_L = "000" report "bad left signal" severity failure;
+       wait for k_clk_period;
+           assert w_lights_R = "011" report "bad left signal" severity failure;
+           assert w_lights_L = "000" report "bad left signal" severity failure;
+       wait for k_clk_period;
+           assert w_lights_R = "111" report "bad left signal" severity failure;
+           assert w_lights_L = "000" report "bad left signal" severity failure;
+        --w_reset <= '1';
+         w_right <= '0';
+        --wait for k_clk_period*1;
      
        
 	   wait;
